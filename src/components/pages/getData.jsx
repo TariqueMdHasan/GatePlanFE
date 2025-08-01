@@ -1,173 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { toast } from "react-toastify";
-// import axios from "axios";
-
-// const headerStatus = ["TODO", "INPROGRESS", "DONE", "BACKLOG"];
-
-// function GetData() {
-//   const [TodoList, setTodoList] = useState([]);
-//   const [showDeleteModal, setShowDeleteModal] = useState(false);
-//   const [selectedTodo, setSelectedTodo] = useState(null);
-
-//   const fetchData = async () => {
-//     try {
-//       const result = await axios.get("https://gateplanbe.onrender.com/api/todoData/");
-//       if (Array.isArray(result.data.todos)) {
-//         setTodoList(result.data.todos);
-//       } else {
-//         console.error("Unexpected response format", result.data);
-//         toast.error("Data Not Found");
-//       }
-//     } catch (error) {
-//       console.error("not able to find data", error);
-//       toast.error("Error, Please try again later");
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchData();
-//   }, []);
-
-//   const handleStatusChange = async (id, newStatus) => {
-//     try {
-//       await axios.put(`https://gateplanbe.onrender.com/api/todoData/update/${id}`, { status: newStatus });
-//       toast.success("Status updated!");
-//       fetchData();
-//     } catch (err) {
-//       console.error("Update failed", err);
-//       toast.error("Failed to update status");
-//     }
-//   };
-
-//   const handleDelete = async () => {
-//     try {
-//       await axios.delete(`https://gateplanbe.onrender.com/api/todoData/delete/${selectedTodo._id}`);
-//       toast.success("Todo deleted");
-//       setShowDeleteModal(false);
-//       setSelectedTodo(null);
-//       fetchData();
-//     } catch (err) {
-//       toast.error("Failed to delete");
-//       console.error(err);
-//     }
-//   };
-
-//   return (
-//     <>
-//       {showDeleteModal && (
-//         <div className="fixed inset-0 bg-[rgba(75,75,75,0.9)] bg-opacity-30 flex items-center justify-center z-50"
-//         onClick={()=> {
-//           setShowDeleteModal(false)
-//         }}>
-//           <div className="bg-white p-6 rounded-lg shadow-md w-80">
-//             <h2 className="text-lg font-semibold mb-4">Are you sure you want to delete?</h2>
-//             <div className="flex justify-end gap-4">
-//               <button
-//                 className="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400"
-//                 onClick={() => {
-//                   setShowDeleteModal(false);
-//                   setSelectedTodo(null);
-//                 }}
-//               >
-//                 Cancel
-//               </button>
-//               <button
-//                 className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-//                 onClick={handleDelete}
-//               >
-//                 Delete
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       <div className="px-2 lg:px-0 w-full h-10/12 overflow-x-auto flex flex-row lg:justify-between lg:w-11/12">
-//         {headerStatus.map((status, headerId) => (
-//           <div
-//             key={headerId}
-//             className="min-w-[280px] lg:w-[250px] h-full border-2 border-gray-400 rounded-2xl mx-2 lg:m-0 flex flex-col"
-//           >
-//             <h1 className="bg-gray-100 border-b-2 border-b-gray-400 text-center font-semibold py-2 rounded-t-2xl">
-//               {status}
-//             </h1>
-
-//             <div className="w-full flex-1 overflow-y-auto flex flex-col gap-4 p-4 relative">
-//               {TodoList.filter((todo) => todo.status.toUpperCase() === status).map((todo, index) => (
-//                 <div
-//                   key={todo._id || index}
-//                   className={`min-h-30 w-full border-2 rounded-2xl mt-2 flex justify-center pl-4 p-2 flex-col
-//                     ${status === "TODO" ? 'bg-pink-200 border-pink-400': status==="INPROGRESS"?
-//                       "bg-yellow-200 border-yellow-400": status=== "DONE"? "bg-green-200 border-green-400":
-//                       "bg-red-200 border-red-400"}`}
-//                 >
-//                   <div className="flex h-auto justify-between">
-//                     <h1 className="text-lg font-bold">{todo.subject}</h1>
-//                     <label className="text-[10px] cursor-pointer">
-//                       STATUS:
-//                       <select
-//                         className="cursor-pointer text-[10px] bg-white border ml-1 rounded"
-//                         value={todo.status.toUpperCase()}
-//                         onChange={(e) => handleStatusChange(todo._id, e.target.value.toLowerCase())}
-//                       >
-//                         {headerStatus.map((opt) => (
-//                           <option key={opt} value={opt.toLowerCase()}>
-//                             {opt}
-//                           </option>
-//                         ))}
-//                       </select>
-//                     </label>
-//                   </div>
-//                   <div className="flex justify-center">
-//                     <p className={`text-[10px] px-4 py-[1px] rounded-2xl border-2 text-white uppercase 
-//                       ${todo.scheduledIn === "morning"? "bg-orange-400 border-orange-600": 
-//                         todo.scheduledIn === "afternoon"? "bg-blue-400 border-blue-600": 
-//                         "bg-emerald-400 border-emerald-600"
-//                       }`}>
-//                       {todo.scheduledIn}
-//                     </p>
-//                   </div>
-//                   <h2 className="text-[15px] font-medium">{todo.task}</h2>
-//                   <div className="flex justify-between mt-2 items-center">
-//                     <h3 className="text-[12px] text-gray-500">{todo.date}</h3>
-//                     <button
-//                       className="mt-2 text-xs text-white bg-red-500 px-2 rounded hover:bg-red-600 w-fit cursor-pointer"
-//                       onClick={() => {
-//                         setSelectedTodo(todo);
-//                         setShowDeleteModal(true);
-//                       }}
-//                     >
-//                       Delete
-//                     </button>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </>
-//   );
-// }
-
-// export default GetData;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -248,6 +78,16 @@ function GetData({ filterType }) {
       toast.error("Failed to delete");
     }
   };
+
+  const formatCardDate = (dateStr) => {
+  const date = new Date(dateStr);
+  const day = String(date.getDate()).padStart(2, "0");
+  const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+};
+
 
   return (
     <>
@@ -332,7 +172,7 @@ function GetData({ filterType }) {
                   <h2 className="text-[15px] font-medium">{todo.task}</h2>
 
                   <div className="flex justify-between mt-2 items-center">
-                    <h3 className="text-[12px] text-gray-500">{todo.date}</h3>
+                    <h3 className="text-[12px] text-gray-500">{formatCardDate(todo.date)}</h3>
                     <button
                       className="mt-2 text-xs text-white bg-red-500 px-2 rounded hover:bg-red-600 w-fit cursor-pointer"
                       onClick={() => {

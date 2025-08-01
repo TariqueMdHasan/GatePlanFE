@@ -39,7 +39,6 @@ function App() {
 
   return (
     <div className='m-0 h-screen flex flex-col bg-purple-100'>
-      {/* Navbar */}
       <nav className='w-full bg-blue-600 h-[6vh] lg:h-[10vh] text-white flex justify-around items-center'>
         {
           navbarItems.map((item)=> (
@@ -58,7 +57,6 @@ function App() {
         }
       </nav>
 
-      {/* section */}
       <section className='overflow-x-auto h-[94vh] lg:h-[90vh]'>
         {renderComponent()}
       </section>

@@ -1,40 +1,3 @@
-// import React, { useEffect, useState } from "react";
-
-// function DigitalClock() {
-//   const [time, setTime] = useState(new Date());
-
-//   useEffect(() => {
-//     const interval = setInterval(() => setTime(new Date()), 1000);
-//     return () => clearInterval(interval);
-//   }, []);
-
-//   const formatTime = (date) => {
-//     const hours = String(date.getHours()).padStart(2, "0");
-//     const minutes = String(date.getMinutes()).padStart(2, "0");
-//     const seconds = String(date.getSeconds()).padStart(2, "0");
-//     return `${hours}:${minutes}:${seconds}`;
-//   };
-
-//   return (
-//     <h1 className="text-2xl font-bold mb-4 tracking-widest text-emerald-600">
-//       {formatTime(time)}
-//     </h1>
-//   );
-// }
-
-// export default DigitalClock;
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 
 function DigitalClock() {
@@ -51,7 +14,7 @@ function DigitalClock() {
     const seconds = String(date.getSeconds()).padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
 
-    hours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
+    hours = hours % 12 || 12; 
     return `${String(hours).padStart(2, "0")}:${minutes}:${seconds} ${ampm}`;
   };
 
