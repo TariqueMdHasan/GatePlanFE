@@ -38,9 +38,9 @@ function App() {
   ]
 
   return (
-    <div className='m-0 h-screen flex flex-col'>
+    <div className='m-0 h-screen flex flex-col bg-purple-100'>
       {/* Navbar */}
-      <nav className='w-full bg-blue-600 h-12 text-white flex justify-around items-center'>
+      <nav className='w-full bg-blue-600 h-[6vh] lg:h-[10vh] text-white flex justify-around items-center'>
         {
           navbarItems.map((item)=> (
             <div 
@@ -49,7 +49,7 @@ function App() {
               className={
                 `h-full flex justify-center items-center  w-1/5 cursor-pointer
                 transition-all duration-200 
-                ${activeItem === item.id? "bg-white text-black rounded-t-3xl": "bg-blue-600 text-amber-50"}`
+                ${activeItem === item.id? "bg-purple-100 text-black rounded-t-3xl": "bg-blue-600 text-amber-50"}`
               }
               >
               {item.label}
@@ -59,7 +59,7 @@ function App() {
       </nav>
 
       {/* section */}
-      <section className='flex-1 overflow-x-auto'>
+      <section className='overflow-x-auto h-[94vh] lg:h-[90vh]'>
         {renderComponent()}
       </section>
       <button
@@ -82,12 +82,6 @@ function App() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
         </svg>
       </button>
-      {/* <div 
-        onClick={()=> setShowModal(false)}
-        className='flex-1 z-20 bg-amber-400 fixed top-0 left-0'>
-          hii
-
-      </div> */}
 
       {
         showModal && <Todoform onClose={()=> setShowModal(false)} />
