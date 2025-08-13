@@ -8,6 +8,7 @@ function GetData({ filterType }) {
   const [TodoList, setTodoList] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null);
+  const [loader, setLoader] = useState(false)
 
   const isDateInFilter = (dateStr) => {
     const today = new Date();
@@ -41,15 +42,21 @@ function GetData({ filterType }) {
 
   const fetchData = async () => {
     try {
+      setLoader(true)
       const result = await axios.get("https://gateplanbe.onrender.com/api/todoData/");
       if (Array.isArray(result.data.todos)) {
         const filtered = result.data.todos.filter((todo) => isDateInFilter(todo.date));
         setTodoList(filtered);
       } else {
         toast.error("Data Not Found");
+        setLoader(false)
       }
     } catch (error) {
       toast.error("Error, Please try again later");
+      console.error(error)
+      setLoader(false)
+    }finally{
+      setLoader(false)
     }
   };
 
@@ -131,7 +138,9 @@ function GetData({ filterType }) {
               {status}
             </h1>
 
-            <div className="w-full flex-1 overflow-y-auto flex flex-col gap-4 p-4 relative">
+            {
+              loader? <p>Loading...</p> :
+              (<div className="w-full flex-1 overflow-y-auto flex flex-col gap-4 p-4 relative">
               {TodoList.filter((todo) => todo.status.toUpperCase() === status).map((todo) => (
                 <div
                   key={todo._id}
@@ -185,7 +194,8 @@ function GetData({ filterType }) {
                   </div>
                 </div>
               ))}
-            </div>
+            </div>)
+            }
           </div>
         ))}
       </div>
