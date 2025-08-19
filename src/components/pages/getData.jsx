@@ -67,16 +67,13 @@ function GetData({ filterType }) {
   };
 
   useEffect(() => {
-    // 1️⃣ Load cached data instantly (no loader delay)
     const cachedData = localStorage.getItem("todosData");
     if (cachedData) {
       setTodoList(applyFilter(JSON.parse(cachedData)));
     }
 
-    // 2️⃣ Fetch fresh data in background
     fetchData();
 
-    // 3️⃣ Auto-refresh every 1 min
     const interval = setInterval(fetchData, 60_000);
     return () => clearInterval(interval);
   }, [filterType]);

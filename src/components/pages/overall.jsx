@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Clock3 } from "lucide-react";
 
 const months = [
   "January", "February", "March", "April", "May", "June",
@@ -14,7 +14,6 @@ const Overall = () => {
   const [showUpdated, setShowUpdated] = useState(false);
 
   useEffect(() => {
-    // 1️⃣ Load cached data instantly
     const cachedData = localStorage.getItem("todosData");
     if (cachedData) {
       const parsedData = JSON.parse(cachedData);
@@ -22,10 +21,8 @@ const Overall = () => {
       setFilteredData(parsedData);
     }
 
-    // 2️⃣ Always fetch fresh data on mount
     fetchData();
 
-    // 3️⃣ Auto-refresh every 1 minute
     const interval = setInterval(fetchData, 60_000);
     return () => clearInterval(interval);
   }, []);
@@ -82,10 +79,17 @@ const Overall = () => {
         className={`inline-flex items-center px-2 py-0.5 rounded-lg mr-1 ${
           t.status === "done"
             ? "bg-green-100 text-green-800 opacity-70 italic"
+            : t.status === "inprogress"
+            ? "bg-yellow-100 text-yellow-800"
             : "bg-gray-100 text-gray-800"
         }`}
       >
-        {t.status === "done" && <span className="mr-1">✅</span>}
+        {t.status === "done" && (
+          <CheckCircle2 size={14} className="mr-1 text-green-600" />
+        )}
+        {t.status === "inprogress" && (
+          <Clock3  size={14} className="mr-1 text-yellow-600 animate-spin" />
+        )}
         {`${t.subject}: ${t.task}`}
         {idx < tasks.length - 1 ? "," : ""}
       </span>
