@@ -78,18 +78,41 @@ function GetData({ filterType }) {
     return () => clearInterval(interval);
   }, [filterType]);
 
+  // const handleStatusChange = async (id, newStatus) => {
+  //   try {
+  //     await axios.put(
+  //       `https://gateplanbe.onrender.com/api/todoData/update/${id}`,
+  //       { status: newStatus }
+  //     );
+  //     toast.success("Status updated!");
+  //     fetchData();
+  //   } catch (err) {
+  //     toast.error("Failed to update status");
+  //   }
+  // };
+
   const handleStatusChange = async (id, newStatus) => {
-    try {
-      await axios.put(
-        `https://gateplanbe.onrender.com/api/todoData/update/${id}`,
-        { status: newStatus }
-      );
-      toast.success("Status updated!");
-      fetchData();
-    } catch (err) {
-      toast.error("Failed to update status");
-    }
-  };
+  try {
+    await axios.put(
+      `https://gateplanbe.onrender.com/api/todoData/update/${id}`,
+      { status: newStatus }
+    );
+
+    // Update UI immediately
+    const updatedTodos = TodoList.map((t) =>
+      t._id === id ? { ...t, status: newStatus } : t
+    );
+    setTodoList(updatedTodos);
+
+    // Sync with localStorage
+    localStorage.setItem("todosData", JSON.stringify(updatedTodos));
+
+    toast.success("Status updated!");
+  } catch (err) {
+    toast.error("Failed to update status");
+  }
+};
+
 
   const handleDelete = async () => {
     try {
