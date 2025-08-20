@@ -1,12 +1,14 @@
 import React from 'react'
-import GetData from './getData';
-import DigitalClock from './digitalCloack';
+// import GetData from './getData';
+// import DigitalClock from './digitalCloack';
+import ExamCountdown from './ExamCountdown'
 
 function Week() {
   return (
-    <div className='w-full h-full flex flex-col justify-center items-center '>
-      <DigitalClock />
-      <GetData filterType="week" />
+    <div >
+      {/* <DigitalClock />
+      <GetData filterType="week" /> */}
+      <ExamCountdown />
     </div>
   )
 }
