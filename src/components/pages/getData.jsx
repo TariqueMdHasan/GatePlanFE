@@ -361,6 +361,7 @@ function GetData({ filterType }) {
       toast.success("Status updated!");
     } catch (err) {
       toast.error("Failed to update status");
+      console.error(err)
     }
   };
 
@@ -375,6 +376,7 @@ function GetData({ filterType }) {
       fetchData();
     } catch (err) {
       toast.error("Failed to delete");
+      console.error(err)
     }
   };
 
