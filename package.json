@@ -17,7 +17,6 @@
     "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.536.0",
     "react": "^19.1.0",
-    "react-beautiful-dnd": "^13.1.1",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.0",
     "react-toastify": "^11.0.5",
