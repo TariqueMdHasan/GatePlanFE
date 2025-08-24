@@ -1,14 +1,14 @@
 import React from 'react'
-// import GetData from './getData';
-// import DigitalClock from './digitalCloack';
+import DigitalClock from './digitalCloack';
 import ExamCountdown from './ExamCountdown'
+import SyllabusTracker from './SyllabusTracker'
 
 function Week() {
   return (
     <div >
-      {/* <DigitalClock />
-      <GetData filterType="week" /> */}
+      <DigitalClock />
       <ExamCountdown />
+      <SyllabusTracker />
     </div>
   )
 }

@@ -121,7 +121,7 @@ const SubjectTable = () => {
               {subjects.map((subj) => (
                 <tr
                   key={subj._id}
-                  className="hover:bg-gray-50 transition-colors"
+                  className=" transition-colors"
                 >
                   <td className="px-4 py-3 border-b font-medium text-gray-800">
                     {editingSubject === subj._id ? (

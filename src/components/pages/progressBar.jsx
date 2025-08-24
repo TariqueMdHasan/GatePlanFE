@@ -101,7 +101,7 @@ const ProgressBar = () => {
               );
 
               return (
-                <tr key={subject._id} className="border-b hover:bg-gray-50 transition">
+                <tr key={subject._id} className="border-b transition">
                   <td className="p-3 font-medium">{subject.subject}</td>
                   <td className="p-3">
                     {new Date(subject.subjectStart).toLocaleDateString("en-GB", {

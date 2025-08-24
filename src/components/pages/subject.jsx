@@ -15,9 +15,9 @@ function Subject() {
       {
         showModal && <SubjectForm onClose={()=> setShowModal(false)} />
       }
-      <SubjectTable />
-      <SubjectOptionsTable />
       <ProgressBar />
+      <SubjectOptionsTable />
+      <SubjectTable />
       {/* <ExamCountdown /> */}
       {/* <p
         className="mt-6 text-center text-2xl font-extrabold 
