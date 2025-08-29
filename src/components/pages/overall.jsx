@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { CheckCircle2, Clock3, Download } from "lucide-react";
+import { CheckCircle2, Clock3, Download, AlertCircle  } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "react-toastify";
@@ -114,11 +114,15 @@ const Overall = () => {
         key={idx}
         draggable
         onDragStart={() => setDraggedTask(t)} 
-        className={`inline-flex items-center px-2 py-0.5 rounded-lg mr-1 cursor-grab ${
+        className={`inline-flex items-center px-2 py-0.5 rounded-lg m-1 cursor-grab ${
           t.status === "done"
             ? "bg-green-100 text-green-800 opacity-70 italic"
             : t.status === "inprogress"
             ? "bg-yellow-100 text-yellow-800"
+            // new adding here
+            : t.status === "backlog"
+            ? "bg-red-100 text-red-800"
+            // new ending here
             : "bg-gray-100 text-gray-800"
         }`}
       >
@@ -128,6 +132,12 @@ const Overall = () => {
         {t.status === "inprogress" && (
           <Clock3 size={14} className="mr-1 text-yellow-600 animate-spin" />
         )}
+        {/* new here */}
+        {t.status === "backlog" && (
+          // <span className="mr-1 text-red-600">⚠</span>
+          <AlertCircle size={14} className="mr-1 text-red-600" />
+        )}
+        {/* end here */}
         {`${t.subject}: ${t.task}`}
         {idx < tasks.length - 1 ? "," : ""}
       </span>
