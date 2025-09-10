@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-const TASK_API = import.meta.env.VITE_TASK
 const SUB_API = import.meta.env.VITE_SUBJECT
 
 const SubjectTable = () => {
