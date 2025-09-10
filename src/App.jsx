@@ -5,7 +5,8 @@ import Month from './components/pages/month'
 import Week from './components/pages/week'
 import Overall from './components/pages/overall'
 import Subject from './components/pages/subject'
-import Todoform from './components/forms/todoform'
+// import Todoform from './components/forms/todoform'
+import Todoform from './components/forms/bulkForm'
 
 function App() {
   const [activeItem, setActiveItem] = useState('today')
