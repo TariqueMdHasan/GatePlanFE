@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+const SUB_API = import.meta.env.VITE_SUBJECT
 
 const SubjectOptionsTable = () => {
   const [subjects, setSubjects] = useState([]);
@@ -15,7 +16,7 @@ const SubjectOptionsTable = () => {
           setLoading(false);
         }
 
-        const res = await axios.get("https://gateplanbe.onrender.com/api/subject/");
+        const res = await axios.get(`${SUB_API}`);
         if (res.status === 200) {
           setSubjects(res.data.subjectInfo || []);
           localStorage.setItem("subjectData", JSON.stringify(res.data.subjectInfo));
@@ -39,7 +40,7 @@ const SubjectOptionsTable = () => {
       setSubjects(updatedSubjects);
       localStorage.setItem("subjectData", JSON.stringify(updatedSubjects));
 
-      await axios.put(`https://gateplanbe.onrender.com/api/subject/update/${id}`, {
+      await axios.put(`${SUB_API}update/${id}`, {
         [field]: !currentValue,
       });
 
@@ -75,7 +76,7 @@ const SubjectOptionsTable = () => {
               {subjects.map((subj) => (
                 <tr
                   key={subj._id}
-                  className="hover:bg-gray-50 transition-colors"
+                  className="transition-colors"
                 >
                   <td className="px-4 py-3 border-b font-medium text-gray-800">
                     {subj.subject}

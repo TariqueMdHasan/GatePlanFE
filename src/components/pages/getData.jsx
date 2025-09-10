@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+const TASK_API = import.meta.env.VITE_TASK
+
 
 const headerStatus = ["TODO", "INPROGRESS", "DONE", "BACKLOG"];
 
@@ -10,7 +12,7 @@ function GetData({ filterType }) {
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [draggedTodo, setDraggedTodo] = useState(null);
   const [showUpdated, setShowUpdated] = useState(false);
-  const [editingTodo, setEditingTodo] = useState(null); // new state
+  const [editingTodo, setEditingTodo] = useState(null); 
 
   const isDateInFilter = (dateStr) => {
     const today = new Date();
@@ -46,7 +48,7 @@ function GetData({ filterType }) {
 
   const fetchData = async () => {
     try {
-      const result = await axios.get("https://gateplanbe.onrender.com/api/todoData/");
+      const result = await axios.get(`${TASK_API}`);
       if (Array.isArray(result.data.todos)) {
         const newTodos = result.data.todos;
 
@@ -82,7 +84,7 @@ function GetData({ filterType }) {
   const handleStatusChange = async (id, newStatus) => {
     try {
       await axios.put(
-        `https://gateplanbe.onrender.com/api/todoData/update/${id}`,
+        `${TASK_API}update/${id}`,
         { status: newStatus.toLowerCase() }
       );
 
@@ -103,7 +105,7 @@ function GetData({ filterType }) {
   const handleEditSave = async (todo) => {
     try {
       await axios.put(
-        `https://gateplanbe.onrender.com/api/todoData/update/${todo._id}`,
+        `${TASK_API}update/${todo._id}`,
         {
           status: todo.status.toLowerCase(),
           date: todo.date,
@@ -129,7 +131,7 @@ function GetData({ filterType }) {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `https://gateplanbe.onrender.com/api/todoData/delete/${selectedTodo._id}`
+        `${TASK_API}delete/${selectedTodo._id}`
       );
       toast.success("Todo deleted");
       setShowDeleteModal(false);
@@ -161,7 +163,6 @@ function GetData({ filterType }) {
         </div>
       )}
 
-      {/* Delete Modal */}
       {showDeleteModal && (
         <div
           className="fixed inset-0 bg-[rgba(75,75,75,0.9)] bg-opacity-30 flex items-center justify-center z-50"
@@ -197,7 +198,7 @@ function GetData({ filterType }) {
           <div
             key={headerId}
             className="min-w-[280px] lg:w-[250px] h-full border-2 border-purple-500 rounded-2xl mx-2 lg:m-0 flex flex-col"
-            onDragOver={(e) => e.preventDefault()} // allow drop
+            onDragOver={(e) => e.preventDefault()} 
             onDrop={() => {
               if (draggedTodo && draggedTodo.status.toUpperCase() !== status) {
                 handleStatusChange(draggedTodo._id, status);
@@ -223,7 +224,6 @@ function GetData({ filterType }) {
                 >
                   {editingTodo?._id === todo._id ? (
                     <>
-                      {/* Edit Mode */}
                       <input
                         type="date"
                         value={todo.date.split("T")[0]}
@@ -247,14 +247,12 @@ function GetData({ filterType }) {
 
                       <div className="flex gap-2">
                         <button
-                          // className="bg-green-500 text-white px-2 py-1 rounded cursor-pointer"
                           className="mt-2 text-xs text-white bg-green-400 px-2 py-0.5 rounded hover:bg-green-600 w-fit cursor-pointer"
                           onClick={() => handleEditSave(editingTodo)}
                         >
                           Save
                         </button>
                         <button
-                          // className="bg-gray-400 text-white px-2 py-1 rounded cursor-pointer"
                           className="mt-2 text-xs text-white bg-gray-400 px-2 py-0.5 rounded hover:bg-gray-600 w-fit cursor-pointer"
                           onClick={() => setEditingTodo(null)}
                         >
@@ -267,7 +265,6 @@ function GetData({ filterType }) {
                       <div className="flex h-auto justify-between">
                         <h1 className="text-lg font-bold">{todo.subject}</h1>
                         <button
-                          // className="text-xs bg-blue-500 text-white px-2 rounded"
                           className="mt-2 text-xs text-white bg-blue-500 px-2 rounded hover:bg-blue-600 w-fit cursor-pointer"
                           onClick={() => setEditingTodo(todo)}
                         >

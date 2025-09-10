@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from 'react-toastify';
+const TASK_API = import.meta.env.VITE_TASK
 
 const selectSubject = [
   "TOC",
@@ -55,21 +56,18 @@ function Todoform({ onClose }) {
     try {
       setLoader(true);
       const res = await axios.post(
-        "https://gateplanbe.onrender.com/api/todoData/",
+        `${TASK_API}`,
         formData
       );
       if (res.status === 200 || res.status === 201) {
-        // alert("Task submitted successfully!");
         toast.success('Task submitted successfully')
         onClose();
       } else {
-        // alert("Failed to submit the task.");
         toast.error('Failed to subit task')
         setLoader(false);
       }
     } catch (error) {
       console.error("Error submitting task:", error);
-    //   alert("Something went wrong.");
       toast.error('something went wrong, Please try again later')
       setLoader(false);
     }

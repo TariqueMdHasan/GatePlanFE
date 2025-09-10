@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+const SUB_API = import.meta.env.VITE_SUBJECT
 
 function SubjectForm({ onClose }) {
   const [formData, setFormData] = useState({
@@ -32,7 +33,7 @@ function SubjectForm({ onClose }) {
     try {
       setLoader(true);
       const res = await axios.post(
-        "https://gateplanbe.onrender.com/api/subject",
+        `${SUB_API}`,
         formData
       );
 
@@ -59,7 +60,6 @@ function SubjectForm({ onClose }) {
 
       <div className="w-auto h-auto p-6 rounded-2xl fixed bg-amber-50 z-40 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <form onSubmit={handleSubmit} className="relative block space-y-4">
-          {/* Subject Name */}
           <label className="block">
             Subject:
             <input
@@ -72,7 +72,6 @@ function SubjectForm({ onClose }) {
             />
           </label>
 
-          {/* Checkboxes */}
           <div className="grid grid-cols-2 gap-3 mt-2">
             {["theory", "revision", "pyq", "testSeries", "isCompleted"].map(
               (field) => (
@@ -89,7 +88,6 @@ function SubjectForm({ onClose }) {
             )}
           </div>
 
-          {/* Lectures */}
           <label className="block">
             No. of Lectures:
             <input
@@ -114,7 +112,6 @@ function SubjectForm({ onClose }) {
             />
           </label>
 
-          {/* Dates */}
           <label className="block">
             Start Date:
             <input
@@ -141,7 +138,6 @@ function SubjectForm({ onClose }) {
             />
           </label>
 
-          {/* Buttons */}
           <div className="w-full flex justify-between mt-6">
             <button
               type="button"

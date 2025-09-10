@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+const TASK_API = import.meta.env.VITE_TASK
+const SUB_API = import.meta.env.VITE_SUBJECT
 
 const SubjectTable = () => {
   const [subjects, setSubjects] = useState([]);
@@ -25,7 +27,7 @@ const SubjectTable = () => {
 
     const fetchSubjects = async () => {
       try {
-        const res = await axios.get("https://gateplanbe.onrender.com/api/subject/");
+        const res = await axios.get(`${SUB_API}`);
         if (res.status === 200) {
           const newData = res.data.subjectInfo || [];
           setSubjects(newData);
@@ -49,7 +51,7 @@ const SubjectTable = () => {
 
     try {
       const res = await axios.delete(
-        `https://gateplanbe.onrender.com/api/subject/delete/${id}`
+        `${SUB_API}delete/${id}`
       );
       if (res.status === 200) {
         toast.success("Subject deleted!");
@@ -76,7 +78,7 @@ const SubjectTable = () => {
   const handleSave = async () => {
     try {
       const res = await axios.put(
-        `https://gateplanbe.onrender.com/api/subject/update/${editingSubject}`,
+        `${SUB_API}update/${editingSubject}`,
         editData
       );
       if (res.status === 200) {

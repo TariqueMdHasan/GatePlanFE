@@ -3,7 +3,6 @@ import SubjectForm from '../forms/formSub'
 import SubjectTable from './SubjectTable'
 import SubjectOptionsTable from './SubjectOptionsTable'
 import ProgressBar from './progressBar'
-// import ExamCountdown from './ExamCountdown'
 
 function Subject() {
   const[showModal, setShowModal] = useState(false)
@@ -18,15 +17,6 @@ function Subject() {
       <ProgressBar />
       <SubjectOptionsTable />
       <SubjectTable />
-      {/* <ExamCountdown /> */}
-      {/* <p
-        className="mt-6 text-center text-2xl font-extrabold 
-                  bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 
-                  bg-clip-text text-transparent 
-                  animate-pulse tracking-wide mb-4"
-      >
-        ✨ All The Best ✨
-      </p> */}
       <p
         className="mt-6 text-center text-2xl font-extrabold 
                   text-yellow-400 drop-shadow-lg 

@@ -4,6 +4,7 @@ import { CheckCircle2, Clock3, Download, AlertCircle  } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "react-toastify";
+const TASK_API = import.meta.env.VITE_TASK
 
 const months = [
   "January", "February", "March", "April", "May", "June",
@@ -32,7 +33,7 @@ const Overall = () => {
 
   const fetchData = async () => {
     try {
-      const result = await axios.get("https://gateplanbe.onrender.com/api/todoData/");
+      const result = await axios.get(`${TASK_API}`);
       const newTodos = result.data.todos;
 
       const cachedData = localStorage.getItem("todosData");
@@ -86,7 +87,7 @@ const Overall = () => {
 
     try {
       await axios.put(
-        `https://gateplanbe.onrender.com/api/todoData/update/${draggedTask._id}`,
+        `${TASK_API}update/${draggedTask._id}`,
         {
           ...updatedTask,
           status: updatedTask.status.toLowerCase()
@@ -119,10 +120,8 @@ const Overall = () => {
             ? "bg-green-100 text-green-800 opacity-70 italic"
             : t.status === "inprogress"
             ? "bg-yellow-100 text-yellow-800"
-            // new adding here
             : t.status === "backlog"
             ? "bg-red-100 text-red-800"
-            // new ending here
             : "bg-gray-100 text-gray-800"
         }`}
       >
@@ -132,12 +131,9 @@ const Overall = () => {
         {t.status === "inprogress" && (
           <Clock3 size={14} className="mr-1 text-yellow-600 animate-spin" />
         )}
-        {/* new here */}
         {t.status === "backlog" && (
-          // <span className="mr-1 text-red-600">⚠</span>
           <AlertCircle size={14} className="mr-1 text-red-600" />
         )}
-        {/* end here */}
         {`${t.subject}: ${t.task}`}
         {idx < tasks.length - 1 ? "," : ""}
       </span>

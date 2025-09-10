@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+const SUB_API = import.meta.env.VITE_SUBJECT
 
-const API_URL = "https://gateplanbe.onrender.com/api/subject";
 
 const ProgressBar = () => {
   const [subjects, setSubjects] = useState([]);
@@ -17,7 +17,7 @@ const ProgressBar = () => {
         setSubjects(JSON.parse(cachedData));
         setLoading(false);
       }
-      const { data } = await axios.get(`${API_URL}`);
+      const { data } = await axios.get(`${SUB_API}`);
       setSubjects(data.subjectInfo);
       localStorage.setItem("subjects", JSON.stringify(data.subjectInfo));
       setLoading(false);
@@ -34,11 +34,11 @@ const ProgressBar = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_URL}/delete/${id}`);
+      await axios.delete(`${SUB_API}delete/${id}`);
       toast.success("Subject deleted");
       fetchSubjects();
     } catch (error) {
-      toast.error("Failed to delete subject");
+      toast.error("Failed to delete subject", error);
     }
   };
 
@@ -55,7 +55,7 @@ const ProgressBar = () => {
         return;
       }
 
-      await axios.put(`${API_URL}/update/${id}`, {
+      await axios.put(`${SUB_API}update/${id}`, {
         noOfLecturesCompleted: value,
       });
 
