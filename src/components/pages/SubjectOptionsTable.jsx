@@ -53,7 +53,7 @@ const SubjectOptionsTable = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto mt-10 p-4 bg-white rounded-2xl shadow-md">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">⚙️ Subject Options</h2>
+      <h2 className="text-xl font-bold mb-4 text-center">⚙️ Subject Options</h2>
 
       {loading ? (
         <div className="text-center py-6">Loading...</div>
@@ -61,7 +61,7 @@ const SubjectOptionsTable = () => {
         <div className="text-center py-6 text-gray-500">No subjects found.</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse rounded-lg overflow-hidden">
             <thead>
               <tr className="bg-gray-100 text-gray-700 text-left">
                 <th className="px-4 py-3 border-b">Subject</th>

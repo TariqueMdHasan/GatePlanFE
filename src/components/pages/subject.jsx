@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import SubjectForm from '../forms/formSub'
 import SubjectTable from './SubjectTable'
 import SubjectOptionsTable from './SubjectOptionsTable'
-import ProgressBar from './progressBar'
+// import ProgressBar from './progressBar'
+import SubjectsByMonthTable from './subByMonth'
 
 function Subject() {
   const[showModal, setShowModal] = useState(false)
@@ -14,9 +15,12 @@ function Subject() {
       {
         showModal && <SubjectForm onClose={()=> setShowModal(false)} />
       }
-      <ProgressBar />
-      <SubjectOptionsTable />
+      {/* <ProgressBar /> */}
+      <SubjectsByMonthTable />
       <SubjectTable />
+      <SubjectOptionsTable />
+      
+      {/* <SubjectTable /> */}
       <p
         className="mt-6 text-center text-2xl font-extrabold 
                   text-yellow-400 drop-shadow-lg 

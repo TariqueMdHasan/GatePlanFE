@@ -1,218 +1,339 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-const SUB_API = import.meta.env.VITE_SUBJECT
 
-const SubjectTable = () => {
+const SUB_API = import.meta.env.VITE_SUBJECT;
+
+const ProgressBar = () => {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingSubject, setEditingSubject] = useState(null);
-  const [editData, setEditData] = useState({});
+  const [editingLecturesId, setEditingLecturesId] = useState(null);
+  const [editedLectures, setEditedLectures] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editedFields, setEditedFields] = useState({
+    subject: "",
+    subjectStart: "",
+    subjectEnd: "",
+  });
+  const [deleteSubject, setDeleteSubject] = useState(null); 
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+  const fetchSubjects = async () => {
+    try {
+      const cachedData = localStorage.getItem("subjects");
+      if (cachedData) {
+        setSubjects(JSON.parse(cachedData));
+        setLoading(false);
+      }
+      const { data } = await axios.get(`${SUB_API}`);
+      setSubjects(data.subjectInfo);
+      localStorage.setItem("subjects", JSON.stringify(data.subjectInfo));
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch subjects");
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const cachedData = localStorage.getItem("subjects");
-    if (cachedData) {
-      setSubjects(JSON.parse(cachedData));
-      setLoading(false);
-    }
-
-    const fetchSubjects = async () => {
-      try {
-        const res = await axios.get(`${SUB_API}`);
-        if (res.status === 200) {
-          const newData = res.data.subjectInfo || [];
-          setSubjects(newData);
-          localStorage.setItem("subjects", JSON.stringify(newData));
-        } else {
-          toast.error("Failed to load subjects");
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error("Error fetching subject data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSubjects();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this subject?")) return;
-
+  const confirmDelete = async () => {
     try {
-      const res = await axios.delete(
-        `${SUB_API}delete/${id}`
-      );
-      if (res.status === 200) {
-        toast.success("Subject deleted!");
-        const updated = subjects.filter((s) => s._id !== id);
-        setSubjects(updated);
-        localStorage.setItem("subjects", JSON.stringify(updated));
-      } else {
-        toast.error("Failed to delete subject");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error deleting subject");
+      await axios.delete(`${SUB_API}delete/${deleteSubject._id}`);
+      toast.success(`Subject "${deleteSubject.subject}" deleted`);
+      fetchSubjects();
+      setDeleteSubject(null); 
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete subject");
     }
   };
 
-  const handleEdit = (subject) => {
-    setEditingSubject(subject._id);
-    setEditData({
+  const handleEditLectures = (id, currentValue) => {
+    setEditingLecturesId(id);
+    setEditedLectures(currentValue);
+  };
+
+  const handleSaveLectures = async (id) => {
+    try {
+      const value = Number(editedLectures);
+      if (isNaN(value) || value < 0) {
+        toast.error("Invalid number");
+        return;
+      }
+
+      await axios.put(`${SUB_API}update/${id}`, {
+        noOfLecturesCompleted: value,
+      });
+
+      const updatedSubjects = subjects.map((subj) =>
+        subj._id === id ? { ...subj, noOfLecturesCompleted: value } : subj
+      );
+      setSubjects(updatedSubjects);
+      localStorage.setItem("subjects", JSON.stringify(updatedSubjects));
+      setEditingLecturesId(null);
+      toast.success("Lectures updated!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update lectures");
+    }
+  };
+
+  const handleEditFields = (subject) => {
+    setEditingId(subject._id);
+    setEditedFields({
       subject: subject.subject,
       subjectStart: subject.subjectStart.split("T")[0],
       subjectEnd: subject.subjectEnd.split("T")[0],
     });
   };
-  const handleSave = async () => {
+
+  const handleSaveFields = async (id) => {
     try {
-      const res = await axios.put(
-        `${SUB_API}update/${editingSubject}`,
-        editData
+      await axios.put(`${SUB_API}update/${id}`, editedFields);
+
+      const updatedSubjects = subjects.map((s) =>
+        s._id === id ? { ...s, ...editedFields } : s
       );
-      if (res.status === 200) {
-        toast.success("Subject updated!");
-        const updated = subjects.map((s) =>
-          s._id === editingSubject ? { ...s, ...editData } : s
-        );
-        setSubjects(updated);
-        localStorage.setItem("subjects", JSON.stringify(updated));
-        setEditingSubject(null);
-      } else {
-        toast.error("Failed to update subject");
-      }
+      setSubjects(updatedSubjects);
+      localStorage.setItem("subjects", JSON.stringify(updatedSubjects));
+      setEditingId(null);
+      toast.success("Subject details updated!");
     } catch (err) {
       console.error(err);
-      toast.error("Error updating subject");
+      toast.error("Failed to update subject details");
     }
   };
 
-  return (
-    <div className="w-full max-w-6xl mx-auto mt-10 p-4 bg-white rounded-2xl shadow-md">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        📘 Subjects Overview
-      </h2>
+  const calculateProgress = (completed, total) => {
+    if (!total || total === 0) return 0;
+    return Math.round((completed / total) * 100);
+  };
 
+  return (
+    <div className="p-4 shadow-lg rounded-2xl bg-white max-w-6xl mx-auto mt-6">
+      <h2 className="text-xl font-bold mb-4 text-center">📚 Subjects Progress</h2>
       {loading ? (
-        <div className="text-center py-6">Loading...</div>
-      ) : subjects.length === 0 ? (
-        <div className="text-center py-6 text-gray-500">No subjects found.</div>
+        <p className="text-center">Loading...</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100 text-gray-700 text-left">
-                <th className="px-4 py-3 border-b">Subject</th>
-                <th className="px-4 py-3 border-b">Start Date</th>
-                <th className="px-4 py-3 border-b">End Date</th>
-                <th className="px-4 py-3 border-b text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subjects.map((subj) => (
-                <tr
-                  key={subj._id}
-                  className=" transition-colors"
-                >
-                  <td className="px-4 py-3 border-b font-medium text-gray-800">
-                    {editingSubject === subj._id ? (
+        <table className="w-full border-collapse rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-gray-100 text-left">
+              <th className="p-3">Subject</th>
+              <th className="p-3">Start Date</th>
+              <th className="p-3">End Date</th>
+              <th className="p-3">Progress</th>
+              <th className="p-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {subjects.map((subject) => {
+              const progress = calculateProgress(
+                subject.noOfLecturesCompleted,
+                subject.noOfLectures
+              );
+
+              return (
+                <tr key={subject._id} className="border-b transition">
+                  
+                  <td className="p-3 font-medium">
+                    {editingId === subject._id ? (
                       <input
                         type="text"
-                        value={editData.subject}
+                        value={editedFields.subject}
                         onChange={(e) =>
-                          setEditData({ ...editData, subject: e.target.value })
+                          setEditedFields({
+                            ...editedFields,
+                            subject: e.target.value,
+                          })
                         }
                         className="border rounded px-2 py-1"
                       />
                     ) : (
-                      subj.subject
+                      subject.subject
                     )}
                   </td>
-                  <td className="px-4 py-3 border-b text-gray-600">
-                    {editingSubject === subj._id ? (
+
+                  <td className="p-3">
+                    {editingId === subject._id ? (
                       <input
                         type="date"
-                        value={editData.subjectStart}
+                        value={editedFields.subjectStart}
                         onChange={(e) =>
-                          setEditData({
-                            ...editData,
+                          setEditedFields({
+                            ...editedFields,
                             subjectStart: e.target.value,
                           })
                         }
                         className="border rounded px-2 py-1"
                       />
                     ) : (
-                      formatDate(subj.subjectStart)
+                      new Date(subject.subjectStart).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
                     )}
                   </td>
-                  <td className="px-4 py-3 border-b text-gray-600">
-                    {editingSubject === subj._id ? (
+
+                  <td className="p-3">
+                    {editingId === subject._id ? (
                       <input
                         type="date"
-                        value={editData.subjectEnd}
+                        value={editedFields.subjectEnd}
                         onChange={(e) =>
-                          setEditData({
-                            ...editData,
+                          setEditedFields({
+                            ...editedFields,
                             subjectEnd: e.target.value,
                           })
                         }
                         className="border rounded px-2 py-1"
                       />
                     ) : (
-                      formatDate(subj.subjectEnd)
+                      new Date(subject.subjectEnd).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
                     )}
                   </td>
-                  <td className="px-4 py-3 border-b text-center space-x-2">
-                    {editingSubject === subj._id ? (
-                      <>
-                        <button
-                          onClick={handleSave}
-                          className="px-3 py-1 bg-green-600 text-white rounded-md cursor-pointer"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingSubject(null)}
-                          className="px-3 py-1 bg-gray-500 text-white rounded-md cursor-pointer"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleEdit(subj)}
-                          className="px-3 py-1 bg-blue-600 text-white rounded-md cursor-pointer"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(subj._id)}
-                          className="px-3 py-1 bg-red-600 text-white rounded-md cursor-pointer"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
+
+                  <td className="p-3 w-1/3">
+                    <div className="w-full bg-gray-200 rounded-full h-4 relative">
+                      <div
+                        className="bg-green-500 h-4 rounded-full text-xs text-white flex items-center justify-center"
+                        style={{ width: `${progress}%` }}
+                      >
+                        {progress}%
+                      </div>
+                    </div>
+
+                    <div className="mt-1 inline-flex items-center space-x-2 text-xs text-gray-600">
+                      {editingLecturesId === subject._id ? (
+                        <>
+                          <input
+                            type="number"
+                            value={editedLectures}
+                            onChange={(e) => setEditedLectures(e.target.value)}
+                            className="border rounded px-2 py-1 w-16"
+                            min={0}
+                            max={subject.noOfLectures}
+                          />
+                          <button
+                            onClick={() => handleSaveLectures(subject._id)}
+                            className="bg-green-500 text-white px-2 py-1 rounded cursor-pointer"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={() => setEditingLecturesId(null)}
+                            className="bg-gray-500 text-white px-2 py-1 rounded cursor-pointer"
+                          >
+                            ✕
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span>
+                            {subject.noOfLecturesCompleted}/{subject.noOfLectures} lectures
+                          </span>
+                          <button
+                            onClick={() =>
+                              handleEditLectures(
+                                subject._id,
+                                subject.noOfLecturesCompleted
+                              )
+                            }
+                            className="bg-blue-500 text-white px-2 py-0.5 rounded cursor-pointer"
+                          >
+                            ✏️
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+
+                  <td className="p-3">
+                    <div className="flex space-x-2">
+                      {editingId === subject._id ? (
+                        <>
+                          <button
+                            onClick={() => handleSaveFields(subject._id)}
+                            className="bg-green-600 text-white px-4 py-1 rounded-md cursor-pointer text-sm"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={() => setEditingId(null)}
+                            className="bg-gray-500 text-white px-4 py-1 rounded-md cursor-pointer text-sm"
+                          >
+                            ✕
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleEditFields(subject)}
+                            className="bg-yellow-500 text-white px-3 py-1 rounded-md cursor-pointer text-sm"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => setDeleteSubject(subject)} // open modal with subject
+                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm cursor-pointer"
+                          >
+                            🗑️
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+
+      {deleteSubject && (
+        <div 
+          className="fixed inset-0 bg-[rgba(75,75,75,0.9)] bg-opacity-30 flex items-center justify-center z-50"
+          onClick={() => setDeleteSubject(null)}
+        >
+          <div className="bg-white p-6 rounded-xl shadow-lg text-center w-80 z-60">
+            <h3 className="text-lg font-semibold mb-4">Delete Confirmation</h3>
+            <p className="mb-6">
+              Are you sure you want to delete{" "}
+              <span className="font-bold text-red-600">
+                {deleteSubject.subject}
+              </span>
+              ?
+            </p>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={confirmDelete}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg cursor-pointer"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={() => setDeleteSubject(null)}
+                className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-export default SubjectTable;
+export default ProgressBar;
+
+
+
+
