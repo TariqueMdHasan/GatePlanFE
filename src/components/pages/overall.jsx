@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { CheckCircle2, Clock3, Download, AlertCircle  } from "lucide-react";
+import { CheckCircle2, Clock3, Download, AlertCircle } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "react-toastify";
-const TASK_API = import.meta.env.VITE_TASK
+
+const TASK_API = import.meta.env.VITE_TASK;
 
 const months = [
   "January", "February", "March", "April", "May", "June",
@@ -14,9 +15,17 @@ const months = [
 const Overall = () => {
   const [todos, setTodos] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+
   const [selectedMonth, setSelectedMonth] = useState("Total");
+  const [selectedYear, setSelectedYear] = useState("Total");
+  const [selectedSubject, setSelectedSubject] = useState("Total");
+
   const [showUpdated, setShowUpdated] = useState(false);
-  const [draggedTask, setDraggedTask] = useState(null); 
+  const [draggedTask, setDraggedTask] = useState(null);
+
+  
+  const availableYears = [...new Set(todos.map(t => new Date(t.date).getFullYear()))].sort();
+  const availableSubjects = [...new Set(todos.map(t => t.subject))].sort();
 
   useEffect(() => {
     const cachedData = localStorage.getItem("todosData");
@@ -50,23 +59,30 @@ const Overall = () => {
     }
   };
 
+  
   useEffect(() => {
-    if (selectedMonth === "Total") {
-      setFilteredData(todos);
-    } else {
-      const monthIndex = months.indexOf(selectedMonth) + 1;
-      const filtered = todos.filter((todo) => {
-        const todoMonth = new Date(todo.date).getMonth() + 1;
-        return todoMonth === monthIndex;
-      });
-      setFilteredData(filtered);
+    let data = [...todos];
+
+    if (selectedMonth !== "Total") {
+      const monthIndex = months.indexOf(selectedMonth); // 0-based
+      data = data.filter(todo => new Date(todo.date).getMonth() === monthIndex);
     }
-  }, [selectedMonth, todos]);
+
+    if (selectedYear !== "Total") {
+      data = data.filter(todo => new Date(todo.date).getFullYear().toString() === selectedYear);
+    }
+
+    if (selectedSubject !== "Total") {
+      data = data.filter(todo => todo.subject === selectedSubject);
+    }
+
+    setFilteredData(data);
+  }, [selectedMonth, selectedYear, selectedSubject, todos]);
 
   const groupByDate = (data) => {
     const grouped = {};
     data.forEach((todo) => {
-      const date = todo.date.split("T")[0]; 
+      const date = todo.date.split("T")[0];
       if (!grouped[date]) grouped[date] = [];
       grouped[date].push(todo);
     });
@@ -100,12 +116,12 @@ const Overall = () => {
       setTodos(updatedTodos);
       localStorage.setItem("todosData", JSON.stringify(updatedTodos));
       setDraggedTask(null);
-      toast.success('task updated successfully')
+      toast.success('Task updated successfully');
       setShowUpdated(true);
       setTimeout(() => setShowUpdated(false), 2000);
     } catch (err) {
       console.error("Failed to update task", err);
-      toast.error('task update failed')
+      toast.error('Task update failed');
     }
   };
 
@@ -114,7 +130,7 @@ const Overall = () => {
       <span
         key={idx}
         draggable
-        onDragStart={() => setDraggedTask(t)} 
+        onDragStart={() => setDraggedTask(t)}
         className={`inline-flex items-center px-2 py-0.5 rounded-lg m-1 cursor-grab ${
           t.status === "done"
             ? "bg-green-100 text-green-800 opacity-70 italic"
@@ -144,11 +160,12 @@ const Overall = () => {
     const doc = new jsPDF("p", "mm", "a4");
 
     doc.setFontSize(14);
-    doc.text(
-      `Todo Report - ${selectedMonth === "Total" ? "All Months" : selectedMonth}`,
-      14,
-      15
-    );
+    let filterLabel = `Todos`;
+    if (selectedMonth !== "Total") filterLabel += ` - ${selectedMonth}`;
+    if (selectedYear !== "Total") filterLabel += ` - ${selectedYear}`;
+    if (selectedSubject !== "Total") filterLabel += ` - ${selectedSubject}`;
+
+    doc.text(filterLabel, 14, 15);
 
     const tableData = Object.keys(groupedTodos)
       .sort((a, b) => new Date(a) - new Date(b))
@@ -188,7 +205,7 @@ const Overall = () => {
       headStyles: { fillColor: [66, 66, 66] },
     });
 
-    doc.save(`Todos_${selectedMonth}.pdf`);
+    doc.save(`Todos_Report.pdf`);
   };
 
   return (
@@ -199,21 +216,54 @@ const Overall = () => {
         </div>
       )}
 
-      <div className="mb-4 flex justify-between items-center">
+      {/* Filters */}
+      <div className="mb-4 flex flex-wrap gap-4 justify-between items-center">
+        {/* Month filter */}
         <div>
-          <label className="mr-2 font-semibold">Filter by Month:</label>
+          <label className="mr-2 font-semibold">Month:</label>
           <select
             className="border px-2 py-1 rounded"
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
           >
+            <option value="Total">All</option>
             {months.map((month) => (
               <option key={month} value={month}>{month}</option>
             ))}
-            <option value="Total">Total</option>
           </select>
         </div>
 
+        {/* Year filter */}
+        <div>
+          <label className="mr-2 font-semibold">Year:</label>
+          <select
+            className="border px-2 py-1 rounded"
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+          >
+            <option value="Total">All</option>
+            {availableYears.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Subject filter */}
+        <div>
+          <label className="mr-2 font-semibold">Subject:</label>
+          <select
+            className="border px-2 py-1 rounded"
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+          >
+            <option value="Total">All</option>
+            {availableSubjects.map((subj) => (
+              <option key={subj} value={subj}>{subj}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* PDF button */}
         <button
           onClick={downloadPDF}
           className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow hover:bg-blue-700"
@@ -222,6 +272,7 @@ const Overall = () => {
         </button>
       </div>
 
+      {/* Table */}
       <table className="min-w-full border border-gray-300">
         <thead className="bg-gray-200">
           <tr>

@@ -65,7 +65,11 @@ function BulkTodoForm({ onClose }) {
         className="fixed inset-0 bg-[rgba(75,75,75,0.9)] z-30"
       ></div>
 
-      <div className="w-11/12 max-w-5xl h-auto p-6 rounded-2xl fixed bg-amber-50 z-40 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-auto">
+      {/* <div className="w-11/12 max-w-5xl h-auto p-6 rounded-2xl fixed bg-amber-50 z-40 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-auto"> */}
+      <div className="w-11/12 max-w-5xl max-h-[90vh] p-6 rounded-2xl fixed bg-amber-50 z-40 
+                top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+                overflow-y-auto shadow-lg">
+
         <form onSubmit={handleSubmit}>
           <table className="min-w-full border border-gray-300 text-sm">
             <thead className="bg-gray-200">
