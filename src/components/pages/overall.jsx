@@ -4,12 +4,23 @@ import { CheckCircle2, Clock3, Download, AlertCircle } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "react-toastify";
+import { Loader2 } from "lucide-react";
 
 const TASK_API = import.meta.env.VITE_TASK;
 
 const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const Overall = () => {
@@ -25,8 +36,12 @@ const Overall = () => {
   const [showUpdated, setShowUpdated] = useState(false);
   const [draggedTask, setDraggedTask] = useState(null);
 
-  const availableYears = [...new Set(todos.map(t => new Date(t.date).getFullYear()))].sort();
-  const availableSubjects = [...new Set(todos.map(t => t.subject))].sort();
+  const [loader, setLoader] = useState(null); 
+
+  const availableYears = [
+    ...new Set(todos.map((t) => new Date(t.date).getFullYear())),
+  ].sort();
+  const availableSubjects = [...new Set(todos.map((t) => t.subject))].sort();
 
   useEffect(() => {
     const cachedData = localStorage.getItem("todosData");
@@ -60,29 +75,33 @@ const Overall = () => {
     }
   };
 
-  
   useEffect(() => {
     let data = [...todos];
 
     if (selectedMonth !== "Total") {
       const monthIndex = months.indexOf(selectedMonth);
-      data = data.filter(todo => new Date(todo.date).getMonth() === monthIndex);
+      data = data.filter(
+        (todo) => new Date(todo.date).getMonth() === monthIndex
+      );
     }
 
     if (selectedYear !== "Total") {
-      data = data.filter(todo => new Date(todo.date).getFullYear().toString() === selectedYear);
+      data = data.filter(
+        (todo) => new Date(todo.date).getFullYear().toString() === selectedYear
+      );
     }
 
     if (selectedSubject !== "Total") {
-      data = data.filter(todo => todo.subject === selectedSubject);
+      data = data.filter((todo) => todo.subject === selectedSubject);
     }
 
     if (searchKeyword.trim() !== "") {
       const lower = searchKeyword.toLowerCase();
-      data = data.filter(todo =>
-        todo.subject.toLowerCase().includes(lower) ||
-        todo.task.toLowerCase().includes(lower) ||
-        todo.status.toLowerCase().includes(lower)
+      data = data.filter(
+        (todo) =>
+          todo.subject.toLowerCase().includes(lower) ||
+          todo.task.toLowerCase().includes(lower) ||
+          todo.status.toLowerCase().includes(lower)
       );
     }
 
@@ -112,13 +131,10 @@ const Overall = () => {
     };
 
     try {
-      await axios.put(
-        `${TASK_API}update/${draggedTask._id}`,
-        {
-          ...updatedTask,
-          status: updatedTask.status.toLowerCase()
-        }
-      );
+      await axios.put(`${TASK_API}update/${draggedTask._id}`, {
+        ...updatedTask,
+        status: updatedTask.status.toLowerCase(),
+      });
 
       const updatedTodos = todos.map((t) =>
         t._id === draggedTask._id ? updatedTask : t
@@ -126,21 +142,23 @@ const Overall = () => {
       setTodos(updatedTodos);
       localStorage.setItem("todosData", JSON.stringify(updatedTodos));
       setDraggedTask(null);
-      toast.success('Task updated successfully');
+      toast.success("Task updated successfully");
       setShowUpdated(true);
       setTimeout(() => setShowUpdated(false), 2000);
     } catch (err) {
       console.error("Failed to update task", err);
-      toast.error('Task update failed');
+      toast.error("Task update failed");
     }
   };
 
+ 
   const shiftTasks = async (direction) => {
     if (!shiftDays || isNaN(shiftDays)) {
       toast.error("Enter valid days");
       return;
     }
 
+    setLoader(direction); // start loader for clicked button
     const delta = direction === "forward" ? shiftDays : -shiftDays;
 
     const updatedTasks = filteredData.map((task) => {
@@ -170,6 +188,8 @@ const Overall = () => {
     } catch (err) {
       console.error("Shift failed", err);
       toast.error("Failed to shift tasks");
+    } finally {
+      setLoader(null); // stop loader
     }
   };
 
@@ -212,7 +232,8 @@ const Overall = () => {
     if (selectedMonth !== "Total") filterLabel += ` - ${selectedMonth}`;
     if (selectedYear !== "Total") filterLabel += ` - ${selectedYear}`;
     if (selectedSubject !== "Total") filterLabel += ` - ${selectedSubject}`;
-    if (searchKeyword.trim() !== "") filterLabel += ` - Search: ${searchKeyword}`;
+    if (searchKeyword.trim() !== "")
+      filterLabel += ` - Search: ${searchKeyword}`;
 
     doc.text(filterLabel, 14, 15);
 
@@ -265,9 +286,7 @@ const Overall = () => {
         </div>
       )}
 
-      
       <div className="mb-4 flex flex-wrap gap-4 justify-between items-center">
-        
         <div>
           <label className="mr-2 font-semibold">Month:</label>
           <select
@@ -277,12 +296,13 @@ const Overall = () => {
           >
             <option value="Total">All</option>
             {months.map((month) => (
-              <option key={month} value={month}>{month}</option>
+              <option key={month} value={month}>
+                {month}
+              </option>
             ))}
           </select>
         </div>
 
-        
         <div>
           <label className="mr-2 font-semibold">Year:</label>
           <select
@@ -292,12 +312,13 @@ const Overall = () => {
           >
             <option value="Total">All</option>
             {availableYears.map((year) => (
-              <option key={year} value={year}>{year}</option>
+              <option key={year} value={year}>
+                {year}
+              </option>
             ))}
           </select>
         </div>
 
-        
         <div>
           <label className="mr-2 font-semibold">Subject:</label>
           <select
@@ -307,12 +328,13 @@ const Overall = () => {
           >
             <option value="Total">All</option>
             {availableSubjects.map((subj) => (
-              <option key={subj} value={subj}>{subj}</option>
+              <option key={subj} value={subj}>
+                {subj}
+              </option>
             ))}
           </select>
         </div>
 
-        
         <div>
           <label className="mr-2 font-semibold">Search:</label>
           <input
@@ -324,16 +346,16 @@ const Overall = () => {
           />
         </div>
 
-        
         <button
           onClick={downloadPDF}
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow hover:bg-blue-700"
+          className="flex cursor-pointer items-center gap-2 bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow hover:bg-blue-700"
         >
           <Download size={16} /> Download PDF
         </button>
       </div>
 
-      
+
+
       <div className="mb-4 flex flex-wrap gap-2 items-center">
         <label className="font-semibold">Shift Days:</label>
         <input
@@ -342,21 +364,48 @@ const Overall = () => {
           onChange={(e) => setShiftDays(Number(e.target.value))}
           className="border px-2 py-1 rounded w-20"
         />
+
+        {/* Backward Button */}
         <button
           onClick={() => shiftTasks("backward")}
-          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+          disabled={loader !== null}
+          className={`flex items-center gap-2 px-3 py-1 rounded cursor-pointer ${
+            loader !== null
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-red-500 text-white hover:bg-red-600"
+          }`}
         >
-          ⏪ Backward
+          {loader === "backward" ? (
+            <>
+              <Loader2 className="animate-spin" size={16} />
+              Shifting ⏪
+            </>
+          ) : (
+            "⏪ Backward"
+          )}
         </button>
+
+        {/* Forward Button */}
         <button
           onClick={() => shiftTasks("forward")}
-          className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+          disabled={loader !== null}
+          className={`flex items-center gap-2 px-3 py-1 rounded cursor-pointer ${
+            loader !== null
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-green-700 text-white hover:bg-green-600"
+          }`}
         >
-          Forward ⏩
+          {loader === "forward" ? (
+            <>
+              <Loader2 className="animate-spin" size={16} />
+              Forward ⏩
+            </>
+          ) : (
+            "Forward ⏩"
+          )}
         </button>
       </div>
 
-      
       <table className="min-w-full border border-gray-300">
         <thead className="bg-gray-200">
           <tr>
@@ -373,7 +422,9 @@ const Overall = () => {
             .map((date) => {
               const tasks = groupedTodos[date];
               const morning = tasks.filter((t) => t.scheduledIn === "morning");
-              const afternoon = tasks.filter((t) => t.scheduledIn === "afternoon");
+              const afternoon = tasks.filter(
+                (t) => t.scheduledIn === "afternoon"
+              );
               const night = tasks.filter((t) => t.scheduledIn === "night");
               const allDone = allDoneForDate(tasks);
 
