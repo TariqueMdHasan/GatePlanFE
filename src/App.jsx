@@ -8,12 +8,13 @@ import Subject from './components/pages/subject'
 import TodoFormOne from './components/forms/todoform'
 import TodoFormBulk from './components/forms/bulkForm'
 import ScheduleGenerator from './components/forms/scGen'
+import JsonBulkUploader from './components/forms/jsonbulkLoader'
 
 function App() {
   const [activeItem, setActiveItem] = useState('today')
   const [showSplash, setShowSplash] = useState(true)
 
-  // modal states
+  
   const [showSelector, setShowSelector] = useState(false)
   const [selectedForm, setSelectedForm] = useState(null)
 
@@ -61,7 +62,7 @@ function App() {
 
   return (
     <div className='m-0 h-screen flex flex-col bg-purple-100'>
-      {/* Navbar */}
+      
       <nav className='w-full bg-blue-600 h-[6vh] lg:h-[10vh] text-white flex justify-around items-center'>
         {navbarItems.map((item) => (
           <div
@@ -80,12 +81,12 @@ function App() {
         ))}
       </nav>
 
-      {/* Content */}
+      
       <section className='overflow-x-auto h-[94vh] lg:h-[90vh]'>
         {renderComponent()}
       </section>
 
-      {/* Floating Add Button */}
+      
       <button
         onClick={() => setShowSelector(true)}
         className="fixed bottom-4 right-4 z-10 
@@ -107,7 +108,7 @@ function App() {
         </svg>
       </button>
 
-      {/* Selector Modal */}
+      
       {showSelector && !selectedForm && (
         <div className="fixed inset-0 z-20 flex items-center justify-center">
           <div
@@ -135,22 +136,25 @@ function App() {
               >
                 📚 Add Whole Subject
               </button>
+              <button
+                onClick={() => setSelectedForm("jsupload")}
+                className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 cursor-pointer"
+              >
+                📂 Upload JSON
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Render selected form inside modal */}
+      
       {selectedForm && (
         <div className="fixed inset-0 z-40 flex items-center justify-center">
-          {/* <div
-            onClick={() => { setSelectedForm(null); setShowSelector(false); }}
-            className="fixed inset-0 bg-[rgba(75,75,75,0.9)]"
-          ></div> */}
           <div className="z-50">
             {selectedForm === "one" && <TodoFormOne onClose={() => { setSelectedForm(null); setShowSelector(false); }} />}
             {selectedForm === "bulk" && <TodoFormBulk onClose={() => { setSelectedForm(null); setShowSelector(false); }} />}
             {selectedForm === "subject" && <ScheduleGenerator onClose={() => { setSelectedForm(null); setShowSelector(false); }} />}
+            {selectedForm === "jsupload" && <JsonBulkUploader onClose={() => { setSelectedForm(null); setShowSelector(false)}} />}
           </div>
         </div>
       )}
